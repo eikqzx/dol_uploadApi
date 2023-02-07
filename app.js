@@ -96,7 +96,7 @@ app.get('/api/file', (req, res) => {
     const filePath = req.query.filePath;
     fs.readFile(filePath, (err, data) => {
         if (err) {
-            res.status(500).send({
+            res.status(400).send({
             status: false,
             error: 'Failed to read file'+ err,
             path:filePath
