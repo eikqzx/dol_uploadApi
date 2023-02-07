@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const path = require("path")
 const fs = require("fs");
+const nodemon = require('nodemon');
 const app = express();
 
 const storage = multer.diskStorage({
@@ -119,4 +120,8 @@ app.get('/api/file', (req, res) => {
 
 app.listen(8099, () => {
     console.log('Server is running on port 8099');
+});
+
+nodemon({
+    script: 'app.js'
 });
