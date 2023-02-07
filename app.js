@@ -9,13 +9,13 @@ const app = express();
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(req.body.scanFile,"req.scanFile");
+        console.log(req.body.scanFile, "req.scanFile");
         let newPath = `uploads/${req.body.scanFile[0]}`
         fs.mkdirSync(newPath, { recursive: true })
         cb(null, newPath)
     },
     filename: function (req, file, cb) {
-        cb(null,req.body.scanFile[1]  + path.extname(file.originalname)) //Appending extension
+        cb(null, req.body.scanFile[1] + path.extname(file.originalname)) //Appending extension
     }
 })
 
@@ -90,6 +90,22 @@ app.put('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
         res.status(500).send(err);
     }
 });
+
+app.get('/api/file', (req, res) => {
+    const filePath = req.query.filePath;
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            res.status(500).send({ error: 'Failed to read file'+ err,
+            path:filePath
+        });
+            return;
+        }
+
+        const fileAsBase64 = data.toString('base64');
+        res.send({ fileAsBase64 });
+    });
+});
+
 
 app.listen(8099, () => {
     console.log('Server is running on port 8099');
