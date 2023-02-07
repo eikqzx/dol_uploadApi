@@ -62,8 +62,9 @@ app.put('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
         // console.log(req,"req.body");
         // console.log(req.body,"req.params");
         const photos = req.files;
+        console.log(photos,"photos");
         // check if photos are available
-        if (!photos) {
+        if (photos.length == 0) {
             res.status(400).send({
                 status: false,
                 data: 'No Scan Files is selected.'
@@ -95,14 +96,19 @@ app.get('/api/file', (req, res) => {
     const filePath = req.query.filePath;
     fs.readFile(filePath, (err, data) => {
         if (err) {
-            res.status(500).send({ error: 'Failed to read file'+ err,
+            res.status(500).send({
+            status: false,
+            error: 'Failed to read file'+ err,
             path:filePath
         });
             return;
         }
 
         const fileAsBase64 = data.toString('base64');
-        res.send({ fileAsBase64 });
+        res.send({
+            status: true,
+            fileAsBase64:fileAsBase64
+        });
     });
 });
 
