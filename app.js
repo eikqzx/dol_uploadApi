@@ -11,7 +11,7 @@ const app = express();
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // console.log(req.body.scanFile, "req.scanFile");
-        let newPath = `C:/uploads/${req.body.scanFile[0]}`
+        let newPath = `D:/ServerImage/${req.body.scanFile[0]}`
         fs.mkdirSync(newPath, { recursive: true })
         cb(null, newPath)
     },
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 })
 
 const fileFilter = (req, file, cb) => {
-    const filePath = `C:/uploads/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
+    const filePath = `D:/ServerImage/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
             fs.unlinkSync(filePath);
@@ -68,7 +68,7 @@ app.post('/api/single', async (req, res) => {
     }
 });
 
-app.put('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
+app.post('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
     try {
         // console.log(req,"req.body");
         // console.log(req.body,"req.params");
@@ -105,19 +105,20 @@ app.put('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
 
 app.get('/api/file', (req, res) => {
     const filePath = req.query.filePath;
-    fs.readFile(filePath, (err, data) => {
+    console.log(filePath,"test");
+    fs.readFile(`D:/ServerImage${filePath}`, (err, data) => {
         try {
             if (err) {
                 res.status(400).send({
                     status: false,
                     error: 'Failed to read file' + err,
-                    path: filePath
+                    path: `D:/ServerImage${filePath}`
                 });
                 return;
             }
 
             const fileAsBase64 = data.toString('base64');
-            res.send({
+            res.status(200).send({
                 status: true,
                 fileAsBase64: fileAsBase64
             });
