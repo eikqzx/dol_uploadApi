@@ -11,7 +11,7 @@ const app = express();
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // console.log(req.body.scanFile, "req.scanFile");
-        let newPath = `uploads/${req.body.scanFile[0]}`
+        let newPath = `C:/uploads/${req.body.scanFile[0]}`
         fs.mkdirSync(newPath, { recursive: true })
         cb(null, newPath)
     },
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 })
 
 const fileFilter = (req, file, cb) => {
-    const filePath = `./uploads/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
+    const filePath = `C:/uploads/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
             fs.unlinkSync(filePath);
@@ -130,8 +130,4 @@ app.get('/api/file', (req, res) => {
 
 app.listen(8099, () => {
     console.log('Server is running on port 8099');
-});
-
-nodemon({
-    script: 'app.js'
 });
