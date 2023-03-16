@@ -11,7 +11,7 @@ const app = express();
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // console.log(req.body.scanFile, "req.scanFile");
-        let newPath = `D:/ServerImage/${req.body.scanFile[0]}`
+        let newPath = `D:/IMAGE/${req.body.scanFile[0]}`
         fs.mkdirSync(newPath, { recursive: true })
         cb(null, newPath)
     },
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 })
 
 const fileFilter = (req, file, cb) => {
-    const filePath = `D:/ServerImage/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
+    const filePath = `D:/IMAGE/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
             fs.unlinkSync(filePath);
@@ -106,13 +106,13 @@ app.post('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
 app.get('/api/file', (req, res) => {
     const filePath = req.query.filePath;
     console.log(filePath,"test");
-    fs.readFile(`D:/ServerImage${filePath}`, (err, data) => {
+    fs.readFile(`D:/IMAGE${filePath}`, (err, data) => {
         try {
             if (err) {
                 res.status(400).send({
                     status: false,
                     error: 'Failed to read file' + err,
-                    path: `D:/ServerImage${filePath}`
+                    path: `D:/IMAGE${filePath}`
                 });
                 return;
             }
