@@ -128,6 +128,31 @@ app.get('/api/file', (req, res) => {
     });
 });
 
+app.get('/api/fileByPath', (req, res) => {
+    const filePath = req.query.filePath;
+    console.log(filePath,"test");
+    fs.readFile(filePath, (err, data) => {
+        try {
+            if (err) {
+                res.status(400).send({
+                    status: false,
+                    error: 'Failed to read file' + err,
+                    path: `${filePath}`
+                });
+                return;
+            }
+
+            const fileAsBase64 = data.toString('base64');
+            res.status(200).send({
+                status: true,
+                fileAsBase64: fileAsBase64
+            });
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    });
+});
+
 
 app.listen(8099, () => {
     console.log('Server is running on port 8099');
