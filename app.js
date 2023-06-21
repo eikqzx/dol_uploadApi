@@ -45,7 +45,7 @@ app.post('/api/single', async (req, res) => {
         const avatar = req.file;
         // make sure file is available
         if (!avatar) {
-            res.status(400).send({
+            res.status(200).send({
                 status: false,
                 data: 'No file is selected.'
             });
@@ -68,7 +68,7 @@ app.post('/api/single', async (req, res) => {
     }
 });
 
-app.post('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
+app.post('/api/multi_upload', upload.array('scanFile', 12),async (req, res) => {
     try {
         // console.log(req,"req.body");
         // console.log(req.body,"req.params");
@@ -76,7 +76,7 @@ app.post('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
         console.log(photos, "photos");
         // check if photos are available
         if (photos.length == 0) {
-            res.status(400).send({
+            res.status(200).send({
                 status: false,
                 data: 'No Scan Files is selected.'
             });
@@ -91,7 +91,7 @@ app.post('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
             }));
 
             // send response
-            res.send({
+            res.status(200).send({
                 status: true,
                 message: 'Scan Files are uploaded.',
                 data: data
@@ -103,13 +103,13 @@ app.post('/api/multi_upload', upload.array('scanFile', 12), (req, res) => {
     }
 });
 
-app.get('/api/file', (req, res) => {
+app.get('/api/file',async (req, res) => {
     const filePath = req.query.filePath;
     console.log(filePath,"test");
-    fs.readFile(`D:/IMAGE${filePath}`, (err, data) => {
+    await fs.readFile(`D:/IMAGE${filePath}`, (err, data) => {
         try {
             if (err) {
-                res.status(400).send({
+                res.status(200).send({
                     status: false,
                     error: 'Failed to read file' + err,
                     path: `D:/IMAGE${filePath}`
