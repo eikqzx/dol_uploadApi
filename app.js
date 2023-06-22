@@ -20,6 +20,18 @@ const storage = multer.diskStorage({
     }
 })
 
+const storageByPath = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // console.log(req.body.scanFile, "req.scanFile");
+        let newPath = `S:${req.body.scanFile[0]}`
+        fs.mkdirSync(newPath, { recursive: true })
+        cb(null, newPath)
+    },
+    filename: function (req, file, cb) {
+        cb(null, req.body.scanFile[1]) //Appending extension
+    }
+})
+
 const fileFilter = (req, file, cb) => {
     const filePath = `D:/IMAGE/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
     fs.access(filePath, fs.constants.F_OK, (err) => {
@@ -30,7 +42,20 @@ const fileFilter = (req, file, cb) => {
     });
 };
 
+const fileFilteByPath = (req, file, cb) => {
+    const filePath = `S:/IMAGE/${req.body.scanFile[0]}/${req.body.scanFile[1]+ path.extname(file.originalname)}`;
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (!err) {
+            fs.unlinkSync(filePath);
+        }
+        cb(null, true);
+    });
+};
+
 const upload = multer({ storage, fileFilter });
+
+const uploadByPath = multer({storageByPath,fileFilteByPath})
+
 
 // enable CORS
 app.use(cors());
@@ -103,6 +128,41 @@ app.post('/api/multi_upload', upload.array('scanFile', 12),async (req, res) => {
     }
 });
 
+app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12),async (req, res) => {
+    try {
+        // console.log(req,"req.body");
+        // console.log(req.body,"req.params");
+        const photos = req.files;
+        console.log(photos, "photos");
+        // check if photos are available
+        if (photos.length == 0) {
+            res.status(200).send({
+                status: false,
+                data: 'No Scan Files is selected.'
+            });
+        } else {
+            let data = [];
+
+            // iterate over all photos
+            photos.map(p => data.push({
+                name: p.originalname,
+                mimetype: p.mimetype,
+                size: p.size
+            }));
+
+            // send response
+            res.status(200).send({
+                status: true,
+                message: 'Scan Files are uploaded.',
+                data: data
+            });
+        }
+
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
 app.get('/api/file',async (req, res) => {
     const filePath = req.query.filePath;
     console.log(filePath,"test");
@@ -131,7 +191,7 @@ app.get('/api/file',async (req, res) => {
 app.get('/api/fileByPath', (req, res) => {
     const filePath = req.query.filePath;
     console.log(filePath,"test");
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(`${filePath}`, (err, data) => {
         try {
             if (err) {
                 res.status(400).send({
@@ -148,7 +208,11 @@ app.get('/api/fileByPath', (req, res) => {
                 fileAsBase64: fileAsBase64
             });
         } catch (error) {
-            res.status(500).send(error);
+            res.status(500).send({
+                status: false,
+                error:  error,
+                path: `${filePath}`
+            });
         }
     });
 });
