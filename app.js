@@ -197,7 +197,7 @@ app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (r
                     const fileAsBase64 = data.toString('base64');
                     // console.log(fileAsBase64,"readFileExists");
                     // return fileAsBase64;
-                    return res.status(200).json({ status:false,message: 'Destination file already exists',file: fileAsBase64,path: newFilePath});
+                    return res.status(200).json({ status:false,message: 'มีไฟล์ปลายทางอยู่ก่อนแล้ว',file: fileAsBase64,path: newFilePath});
                 } catch (err) {
                     return err
                 }
@@ -213,7 +213,7 @@ app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (r
     res.status(200).send(
         {   
             status:true,
-            message: 'File copied successfully',
+            message: 'อัปโหลดไฟล์สำเร็จ',
             data: {
                 sourcePath: sourcePath,
                 destinationPath: destinationPath
