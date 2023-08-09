@@ -8,13 +8,12 @@ const fs = require("fs");
 const nodemon = require('nodemon');
 const app = express();
 
-const readFileExists = async (path) => 
-{ 
+const readFileExists = async (path) => {
     await fs.readFile(path, (err, data) => {
         console.log("========= readFileExists ===========");
         try {
             const fileAsBase64 = data.toString('base64');
-            console.log(fileAsBase64,"readFileExists");
+            console.log(fileAsBase64, "readFileExists");
             return fileAsBase64;
         } catch (err) {
             return err
@@ -76,6 +75,8 @@ app.use(cors());
 
 // add other middleware
 app.use(bodyParser.json());
+
+app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
@@ -189,7 +190,7 @@ app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (r
         if (isConfirm == "1") {
             console.log(isConfirm, "isConfirm if");
             fs.unlinkSync(newFilePath);
-        }else{
+        } else {
             console.log(isConfirm, "isConfirm else");
             return await fs.readFile(newFilePath, (err, data) => {
                 console.log("========= readFileExists ===========");
@@ -197,22 +198,22 @@ app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (r
                     const fileAsBase64 = data.toString('base64');
                     // console.log(fileAsBase64,"readFileExists");
                     // return fileAsBase64;
-                    return res.status(200).json({ status:false,message: 'มีไฟล์ปลายทางอยู่ก่อนแล้ว',file: fileAsBase64,path: newFilePath});
+                    return res.status(200).json({ status: false, message: 'มีไฟล์ปลายทางอยู่ก่อนแล้ว', file: fileAsBase64, path: newFilePath });
                 } catch (err) {
                     return err
                 }
             });
         }
         // console.log(existsFile,"existsFile");
-        
+
     }
 
     // Copy and rename the file
     fs.copyFileSync(sourcePath, newFilePath);
 
     res.status(200).send(
-        {   
-            status:true,
+        {
+            status: true,
             message: 'อัปโหลดไฟล์สำเร็จ',
             data: {
                 sourcePath: sourcePath,
@@ -278,6 +279,40 @@ app.get('/api/fileByPath', (req, res) => {
     });
 });
 
+app.post('/api/deleteFile', (req, res) => {
+    let filePath = req.body
+    console.log(filePath.FILE_PATH, "filePath");
+    if (filePath.FILE_PATH == undefined) {
+        res.status(400).send({
+            MSG: "Require target path file.",
+            STATUS: false
+        });
+    } else {
+        try {
+            if (fs.existsSync(filePath.FILE_PATH)) {
+                fs.unlinkSync(filePath.FILE_PATH);
+                res.status(200).send({
+                    MSG: "Delete file success",
+                    FILE_PATH: filePath.FILE_PATH,
+                    STATUS: true
+                });
+            } else {
+                res.status(404).send({
+                    MSG: "Target file not found",
+                    FILE_PATH: filePath.FILE_PATH,
+                    STATUS: false
+                });
+            }
+        } catch (error) {
+            res.status(500).send({
+                error: error,
+                FILE_PATH: filePath,
+                STATUS: false
+            });
+        }
+    }
+
+})
 
 app.listen(8099, () => {
     console.log('Server is running on port 8099');
