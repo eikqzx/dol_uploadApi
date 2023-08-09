@@ -297,7 +297,7 @@ app.post('/api/deleteFile', (req, res) => {
                     STATUS: true
                 });
             } else {
-                res.status(400).send({
+                res.status(200).send({
                     MSG: "Target file not found",
                     FILE_PATH: filePath.FILE_PATH,
                     STATUS: false
