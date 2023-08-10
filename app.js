@@ -314,6 +314,10 @@ app.post('/api/deleteFile', (req, res) => {
 
 })
 
+app.get('/', async (req, res) => {
+    res.status(200).send("1.00001");
+    });
+
 app.listen(8099, () => {
     console.log('Server is running on port 8099');
 });
