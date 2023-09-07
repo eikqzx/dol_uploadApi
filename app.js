@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
 const storageByPath = multer.diskStorage({
     destination: function (req, file, cb) {
         // console.log(req.body.scanFile, "req.scanFile");
-        let newPath = `S:${req.body.scanFile[0]}`
+        let newPath = `${req.body.scanFile[0]}`
         fs.mkdirSync(newPath, { recursive: true })
         cb(null, newPath)
     },
@@ -55,7 +55,7 @@ const fileFilter = (req, file, cb) => {
     });
 };
 
-const fileFilteByPath = (req, file, cb) => {
+const fileFilterByPath = (req, file, cb) => {
     const filePath = `S:/IMAGE/${req.body.scanFile[0]}/${req.body.scanFile[1] + path.extname(file.originalname)}`;
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
@@ -144,7 +144,7 @@ app.post('/api/multi_upload', upload.array('scanFile', 12), async (req, res) => 
 });
 
 app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (req, res) => {
-    const sourcePath = req.body.scanFile[0]?.replace(/\\\\/g, '\\');;
+    const sourcePath = req.body.scanFile[0]?.replace(/\\\\/g, '\\');
     const destinationPath = req.body.scanFile[1]?.replace(/\\\\/g, '\\');;
     const isConfirm = req.body.scanFile[2]
     console.log(sourcePath, "sourcePath");
@@ -222,6 +222,13 @@ app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (r
         }
     );
 });
+
+app.post('api/uploadFileCiraCore', uploadByPath.array('scanFile', 12), async (req, res) =>{
+    const path = req.body.scanFile[0]?.replace(/\\\\/g, '\\');
+    const file = req.files;
+    console.log(path,"path uploadFileCiraCore");
+    console.log(file,"file uploadFileCiraCore");
+})
 
 app.get('/api/file', async (req, res) => {
     const filePath = req.query.filePath;
