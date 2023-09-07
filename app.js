@@ -56,7 +56,8 @@ const fileFilter = (req, file, cb) => {
 };
 
 const fileFilterByPath = (req, file, cb) => {
-    const filePath = `S:/IMAGE/${req.body.scanFile[0]}/${req.body.scanFile[1] + path.extname(file.originalname)}`;
+    const filePath = `${req.body.scanFile[0]}${req.body.scanFile[1] + path.extname(file.originalname)}`;
+    // console.log(filePath, "fileFilterByPath");
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
             fs.unlinkSync(filePath);
@@ -68,6 +69,10 @@ const fileFilterByPath = (req, file, cb) => {
 const upload = multer({ storage, fileFilter });
 
 const uploadByPath = multer()
+
+const uploadCiraCore = multer({ 
+    storage: storageByPath,
+    fileFilter: fileFilterByPath })
 
 
 // enable CORS
@@ -223,11 +228,38 @@ app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (r
     );
 });
 
-app.post('api/uploadFileCiraCore', uploadByPath.array('scanFile', 12), async (req, res) =>{
-    const path = req.body.scanFile[0]?.replace(/\\\\/g, '\\');
-    const file = req.files;
-    console.log(path,"path uploadFileCiraCore");
-    console.log(file,"file uploadFileCiraCore");
+app.post('/api/uploadFileCiraCore', uploadCiraCore.array('scanFile', 12), async (req, res) => {
+    try {
+        const directory = req.body.scanFile[0];
+        const filename = req.body.scanFile[1];
+        const photos = req.files;
+        console.log(directory, "directory uploadFileCiraCore");
+        console.log(filename, "filename uploadFileCiraCore");
+        if (photos.length == 0) {
+            res.status(200).send({
+                status: false,
+                data: 'ไม่พบไฟล์ที่เลือก'
+            });
+        } else {
+            let data = [];
+            photos.map(p =>
+                data.push({
+                    name: p.originalname,
+                    mimetype: p.mimetype,
+                    size: p.size
+                }));
+            res.status(200).send({
+                status: true,
+                message: 'อัปโหลดไฟล์สำเร็จ',
+                path: directory,
+                filename: filename
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+
 })
 
 app.get('/api/file', async (req, res) => {
@@ -323,7 +355,7 @@ app.post('/api/deleteFile', (req, res) => {
 
 app.get('/', async (req, res) => {
     res.status(200).send("1.00001");
-    });
+});
 
 app.listen(8099, () => {
     console.log('Server is running on port 8099');
