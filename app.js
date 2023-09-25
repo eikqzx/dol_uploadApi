@@ -164,12 +164,12 @@ app.post('/api/multi_uploadByPath', uploadByPath.array('scanFile', 12), async (r
     // })
     // return
     if (!sourcePath || !destinationPath) {
-        return res.status(400).json({ message: 'Both sourcePath and destinationPath are required' });
+        return res.status(200).json({ message: 'Both sourcePath and destinationPath are required',status:false });
     }
 
     // Check if the source file exists
     if (!fs.existsSync(sourcePath)) {
-        return res.status(404).json({ message: 'Source file not found' });
+        return res.status(200).json({ message: 'Source file not found' ,status:false});
     }
 
     const newFileName = path.basename(destinationPath);
@@ -343,7 +343,7 @@ app.post('/api/deleteFile', (req, res) => {
                 });
             }
         } catch (error) {
-            res.status(500).send({
+            res.status(200).send({
                 error: error,
                 FILE_PATH: filePath,
                 STATUS: false
