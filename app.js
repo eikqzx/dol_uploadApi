@@ -293,7 +293,7 @@ app.get('/api/fileByPath', (req, res) => {
     fs.readFile(`${filePath}`, (err, data) => {
         try {
             if (err) {
-                res.status(400).send({
+                res.status(200).send({
                     status: false,
                     error: 'Failed to read file' + err,
                     path: `${filePath}`
@@ -309,7 +309,7 @@ app.get('/api/fileByPath', (req, res) => {
                 fileAsBase64: fileAsBase64,
             });
         } catch (error) {
-            res.status(500).send({
+            res.status(200).send({
                 status: false,
                 error: error,
                 path: `${filePath}`
