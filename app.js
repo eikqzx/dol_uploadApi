@@ -7,6 +7,7 @@ const path = require("path")
 const fs = require("fs");
 const nodemon = require('nodemon');
 const app = express();
+const sharp = require('sharp');
 
 const readFileExists = async (path) => {
     await fs.readFile(path, (err, data) => {
@@ -265,7 +266,7 @@ app.post('/api/uploadFileCiraCore', uploadCiraCore.array('scanFile', 12), async 
 app.get('/api/file', async (req, res) => {
     const filePath = req.query.filePath;
     console.log(filePath, "test");
-    await fs.readFile(`D:/IMAGE${filePath}`, (err, data) => {
+    await fs.readFile(`D:/IMAGE${filePath}`,async (err, data) => {
         try {
             if (err) {
                 res.status(200).send({
@@ -275,8 +276,8 @@ app.get('/api/file', async (req, res) => {
                 });
                 return;
             }
-
-            const fileAsBase64 = data.toString('base64');
+            let desiredData = await sharp(data).jpeg({quality: 70}).toBuffer();
+            const fileAsBase64 = desiredData.toString('base64');
             res.status(200).send({
                 status: true,
                 fileAsBase64: fileAsBase64
@@ -290,7 +291,7 @@ app.get('/api/file', async (req, res) => {
 app.get('/api/fileByPath', (req, res) => {
     const filePath = req.query.filePath;
     console.log(filePath, "test");
-    fs.readFile(`${filePath}`, (err, data) => {
+    fs.readFile(`${filePath}`, async (err, data) => {
         try {
             if (err) {
                 res.status(200).send({
@@ -301,7 +302,8 @@ app.get('/api/fileByPath', (req, res) => {
                 return;
             }
 
-            const fileAsBase64 = data.toString('base64');
+            let desiredData = await sharp(data).jpeg({quality: 70}).toBuffer();
+            const fileAsBase64 = desiredData.toString('base64');
 
             res.status(200).send({
                 path: `${filePath}`,
