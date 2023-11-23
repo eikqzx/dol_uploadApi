@@ -302,7 +302,7 @@ app.get('/api/fileByPath', (req, res) => {
                 return;
             }
 
-            let desiredData = await sharp(data).jpeg({quality: 70}).toBuffer();
+            let desiredData = await sharp(data).jpeg({quality: 60}).toBuffer();
             const fileAsBase64 = desiredData.toString('base64');
 
             res.status(200).send({
