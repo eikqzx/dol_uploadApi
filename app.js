@@ -276,7 +276,7 @@ app.get('/api/file', async (req, res) => {
                 });
                 return;
             }
-            let desiredData = await sharp(data).jpeg({quality: 60}).toBuffer();
+            let desiredData = await sharp(data).jpeg({quality: 50}).toBuffer();
             const fileAsBase64 = desiredData.toString('base64');
             res.status(200).send({
                 status: true,
@@ -302,7 +302,7 @@ app.get('/api/fileByPath', (req, res) => {
                 return;
             }
 
-            let desiredData = await sharp(data).jpeg({quality: 60}).toBuffer();
+            let desiredData = await sharp(data).jpeg({quality: 50}).toBuffer();
             const fileAsBase64 = desiredData.toString('base64');
 
             res.status(200).send({
