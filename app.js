@@ -25,7 +25,7 @@ const readFileExists = async (path) => {
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // console.log(req.body.scanFile, "req.scanFile");
-        let newPath = `S:/${req.body.scanFile[0]}`
+        let newPath = `S:${req.body.scanFile[0]}`
         fs.mkdirSync(newPath, { recursive: true })
         cb(null, newPath)
     },
@@ -47,7 +47,7 @@ const storageByPath = multer.diskStorage({
 })
 
 const fileFilter = (req, file, cb) => {
-    const filePath = `S:/IMAGE/${req.body.scanFile[0]}/${req.body.scanFile[1] + path.extname(file.originalname)}`;
+    const filePath = `S:${req.body.scanFile[0]}/${req.body.scanFile[1] + path.extname(file.originalname)}`;
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
             fs.unlinkSync(filePath);
@@ -266,13 +266,13 @@ app.post('/api/uploadFileCiraCore', uploadCiraCore.array('scanFile', 12), async 
 app.get('/api/file', async (req, res) => {
     const filePath = req.query.filePath;
     console.log(filePath, "test");
-    await fs.readFile(`S:/IMAGE${filePath}`,async (err, data) => {
+    await fs.readFile(`S:${filePath}`,async (err, data) => {
         try {
             if (err) {
                 res.status(200).send({
                     status: false,
                     error: 'Failed to read file' + err,
-                    path: `S:/IMAGE${filePath}`
+                    path: `S:${filePath}`
                 });
                 return;
             }
