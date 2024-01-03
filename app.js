@@ -25,7 +25,7 @@ const readFileExists = async (path) => {
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // console.log(req.body.scanFile, "req.scanFile");
-        let newPath = `S:/IMAGE/${req.body.scanFile[0]}`
+        let newPath = `S:/${req.body.scanFile[0]}`
         fs.mkdirSync(newPath, { recursive: true })
         cb(null, newPath)
     },
