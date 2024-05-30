@@ -8,6 +8,17 @@ const fs = require("fs");
 const nodemon = require('nodemon');
 const app = express();
 const sharp = require('sharp');
+var formidable = require('formidable');
+var util = require('util');
+
+app.use(express.static(__dirname));
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "*");
+    res.header("Access-Control-Allow-Credentials", true);
+    next();
+});
 
 const readFileExists = async (path) => {
     await fs.readFile(path, (err, data) => {
@@ -355,10 +366,31 @@ app.post('/api/deleteFile', (req, res) => {
 
 })
 
+app.post('/uploadTwain', function (req, res) {
+    var form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+        console.log(util.inspect({
+            fields: fields,
+            files: files
+        }));
+        console.log("RemoteFile: ",files.RemoteFile[0].originalFilename);
+        console.log("__dirname",__dirname);
+        fs.readFile(files.RemoteFile[0].filepath, function (err, data) {
+            // save file from temp dir to new dir
+            var newPath = __dirname + "/uploaded/" + files.RemoteFile[0].originalFilename;
+            fs.writeFile(newPath, data, function (err) {
+                if (err) throw err;
+                console.log('file saved');
+                res.end();
+            });
+        });
+    });
+})
+
 app.get('/', async (req, res) => {
     res.status(200).send("1.00001");
 });
 
-app.listen(8099, () => {
-    console.log('Server is running on port 8099');
+app.listen(8100, () => {
+    console.log('Server is running on port 8100');
 });
